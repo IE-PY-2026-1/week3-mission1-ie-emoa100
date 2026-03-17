@@ -1,0 +1,37 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: week3-mission1-ie-test
+      id: week3-mission1-ie-test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: week3-mission1-ie-test
+        setup-command: ''
+        command: python3 main.py
+        input: |-
+          mju
+          80
+          100
+          92.5
+        expected-output: ".*mju\\s+학생의\\s+글쓰기\\s+점수는\\s+80,\\s+파이썬\\s+점수는\\s+100\\s+입니다\\.[\\s\\r\\n]+평균은\\s+90\\.0\\s+이고,\\s+지난\\s+학기와\\s+차이는\\s+-2\\.5\\s+입니다\\."
+        comparison-method: regex
+        timeout: 1
+        max-score: 100
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        WEEK3-MISSION1-IE-TEST_RESULTS: "${{steps.week3-mission1-ie-test.outputs.result}}"
+      with:
+        runners: week3-mission1-ie-test
